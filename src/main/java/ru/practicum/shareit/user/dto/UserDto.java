@@ -1,7 +1,7 @@
-package ru.practicum.shareit.item.dto;
+package ru.practicum.shareit.user.dto;
 
+import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import ru.practicum.shareit.validationgroups.Create;
@@ -12,14 +12,13 @@ import ru.practicum.shareit.validationgroups.Update;
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
 @Value
-public class ItemDto {
+public class UserDto {
     Long id;
     @NotBlank(groups = {Create.class})
     @Size(groups = {Create.class, Update.class}, min = 1)
     String name;
+    @Email(groups = {Create.class, Update.class})
     @NotBlank(groups = {Create.class})
     @Size(groups = {Create.class, Update.class}, min = 1)
-    String description;
-    @NotNull(groups = {Create.class})
-    Boolean available;
+    String email;
 }
