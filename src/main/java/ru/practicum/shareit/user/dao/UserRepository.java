@@ -12,7 +12,7 @@ public interface UserRepository {
 
     Optional<User> get(long userId);
 
-    User update(User newUser, long userId);
+    User update(User newUser);
 
     void delete(long userId);
 }

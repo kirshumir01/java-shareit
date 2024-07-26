@@ -13,5 +13,5 @@ public interface ItemService {
 
     List<ItemDto> getByText(String text);
 
-    ItemDto update(long userId, ItemDto newItemDto, long itemId);
+    ItemDto update(ItemDto newItemDto);
 }

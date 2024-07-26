@@ -60,7 +60,9 @@ public class ItemController {
             @Validated({Update.class}) @RequestBody ItemDto itemDto,
             @PathVariable("itemId") long itemId) {
         log.info("Запрос на обновление информации о вещи {}", itemDto.getName());
-        ItemDto updatedItem = itemService.update(userId, itemDto, itemId);
+        itemDto.setId(itemId);
+        itemDto.setOwnerId(userId);
+        ItemDto updatedItem = itemService.update(itemDto);
         log.info("Информация о вещи {} обновлена", itemDto.getName());
         return updatedItem;
     }

@@ -15,11 +15,10 @@ public class ItemRepositoryImpl implements ItemRepository {
     private long currentId = 0L;
 
     @Override
-    public Item create(Item item, long userId) {
+    public Item create(Item item) {
         item.setId(++currentId);
-        item.setOwnerId(userId);
         items.put(item.getId(), item);
-        final List<Item> itemsByOwner = itemsByUserId.computeIfAbsent(item.getOwnerId(), k -> new ArrayList<>());
+        final List<Item> itemsByOwner = itemsByUserId.computeIfAbsent(item.getOwner().getId(), k -> new ArrayList<>());
         itemsByOwner.add(item);
         return item;
     }
@@ -44,10 +43,10 @@ public class ItemRepositoryImpl implements ItemRepository {
     }
 
     @Override
-    public Item update(Item newItem, long itemId) {
-        items.put(itemId, newItem);
-        List<Item> itemsByOwner = itemsByUserId.get(newItem.getOwnerId());
-        Item itemToRemove = items.get(itemId);
+    public Item update(Item newItem) {
+        items.put(newItem.getId(), newItem);
+        List<Item> itemsByOwner = itemsByUserId.get(newItem.getOwner().getId());
+        Item itemToRemove = items.get(newItem.getId());
         itemsByOwner.remove(itemToRemove);
         itemsByOwner.add(newItem);
         return newItem;

@@ -8,7 +8,8 @@ import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.dao.ItemRepository;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.model.Item;
-import ru.practicum.shareit.user.service.UserService;
+import ru.practicum.shareit.user.dao.UserRepository;
+import ru.practicum.shareit.user.model.User;
 
 import java.util.Collections;
 import java.util.List;
@@ -19,13 +20,17 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
-    private final UserService userService;
+    private final UserRepository userRepository;
     private final ItemMapper itemMapper;
 
     @Override
     public ItemDto create(ItemDto itemDto, long userId) {
-        userService.get(userId);
-        return itemMapper.toItemDto(itemRepository.create(itemMapper.toItem(itemDto), userId));
+        Item createdItem = itemMapper.toItem(itemDto);
+        User itemOwner = userRepository.get(userId).orElseThrow(() -> {
+            throw new NotFoundException(String.format("Пользователь с id %d не найден.", userId));
+        });
+        createdItem.setOwner(itemOwner);
+        return itemMapper.toItemDto(itemRepository.create(createdItem));
     }
 
     @Override
@@ -38,7 +43,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemDto> getAllByOwnerId(long userId) {
-        userService.get(userId);
+        checkUserExistent(userId);
         return itemRepository.getAllByOwnerId(userId)
                 .stream()
                 .map(itemMapper::toItemDto)
@@ -57,29 +62,28 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemDto update(long userId, ItemDto newItemDto, long itemId) {
-        userService.get(userId);
-        checkItemId(itemId);
+    public ItemDto update(ItemDto newItemDto) {
+        checkUserExistent(newItemDto.getOwnerId());
 
-        Item existentItem = itemRepository.getItemById(itemId).orElseThrow(() -> {
-            throw new NotFoundException(String.format("Вещь с идентификатором %d не найдена", itemId));
+        Item existentItem = itemRepository.getItemById(newItemDto.getId()).orElseThrow(() -> {
+            throw new NotFoundException(String.format("Вещь с идентификатором %d не найдена", newItemDto.getId()));
         });
         Item itemForUpdate = itemMapper.toItem(newItemDto);
 
-        if (existentItem.getOwnerId() == userId) {
+        if (!existentItem.getOwner().getId().equals(newItemDto.getOwnerId())) {
+            throw new NotOwnerException(String.format("Пользователь с идентификатором %d" +
+                    " не является собственником вещи '%s'", existentItem.getOwner().getId(), existentItem.getName()));
+        } else {
             existentItem.setName(Objects.requireNonNullElse(itemForUpdate.getName(), existentItem.getName()));
             existentItem.setDescription(Objects.requireNonNullElse(itemForUpdate.getDescription(), existentItem.getDescription()));
             existentItem.setAvailable(Objects.requireNonNullElse(itemForUpdate.getAvailable(), existentItem.getAvailable()));
-        } else {
-            throw new NotOwnerException(String.format("Пользователь с идентификатором %d" +
-                    " не является собственником вещи '%s'", userId, existentItem.getName()));
         }
-        return itemMapper.toItemDto(itemRepository.update(existentItem, itemId));
+        return itemMapper.toItemDto(itemRepository.update(existentItem));
     }
 
-    private void checkItemId(long id) {
-        if (itemRepository.getItemById(id).isEmpty()) {
-            throw new NotFoundException("Вещь с идентификатором " + id + " не найдена.");
+    private void checkUserExistent(long userId) {
+        if (userRepository.get(userId).isEmpty()) {
+            throw new NotFoundException(String.format("Пользователь с id %d не найден.", userId));
         }
     }
 }

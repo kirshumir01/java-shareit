@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ItemRepository {
-    Item create(Item item, long userId);
+    Item create(Item item);
 
     Optional<Item> getItemById(long itemId);
 
@@ -14,5 +14,5 @@ public interface ItemRepository {
 
     List<Item> getByText(String text);
 
-    Item update(Item newItem, long itemId);
+    Item update(Item newItem);
 }

@@ -21,9 +21,13 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto create(UserDto userDto) {
-        checkEmail(userDto);
-        User createdUser = userRepository.create(userMapper.toUser(userDto));
-        return userMapper.toUserDto(createdUser);
+        User user = userRepository.create(userMapper.toUser(userDto));
+
+        if ("duplicate".equals(user.getEmail())) {
+            throw new ConflictException(String.format("Пользователь с адресом электронной %s почты существует.",
+                    userDto.getEmail()));
+        }
+        return userMapper.toUserDto(user);
     }
 
     @Override
@@ -36,50 +40,31 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto get(long userId) {
-        User userFromMemory = userRepository.get(userId).orElseThrow(() -> {
+        User user = userRepository.get(userId).orElseThrow(() -> {
             throw new NotFoundException(String.format("Пользователь с id %d не найден.", userId));
         });
-        return userMapper.toUserDto(userFromMemory);
+        return userMapper.toUserDto(user);
     }
 
     @Override
-    public UserDto update(UserDto newUserDto, long userId) {
-        User existentUser = userRepository.get(userId).orElseThrow(() -> {
-            throw new NotFoundException(String.format("Пользователь с id %d не найден.", userId));
+    public UserDto update(UserDto newUserDto) {
+        User existentUser = userRepository.get(newUserDto.getId()).orElseThrow(() -> {
+            throw new NotFoundException(String.format("Пользователь с id %d не найден.", newUserDto.getId()));
         });
-        User userForUpdate = userMapper.toUser(newUserDto);
+        User newUser = userRepository.update(userMapper.toUser(newUserDto));
 
-        checkUserId(userId);
-        if (!existentUser.getEmail().equals(userForUpdate.getEmail())) {
-            checkEmail(newUserDto);
+        if ("duplicate".equals(newUser.getEmail())) {
+            throw new ConflictException(String.format("Пользователь с адресом электронной %s почты существует.",
+                    newUserDto.getEmail()));
         }
 
-        existentUser.setName(Objects.requireNonNullElse(userForUpdate.getName(), existentUser.getName()));
-        existentUser.setEmail(Objects.requireNonNullElse(userForUpdate.getEmail(), existentUser.getEmail()));
-
-        return userMapper.toUserDto(userRepository.update(existentUser, userId));
+        existentUser.setName(Objects.requireNonNullElse(newUser.getName(), existentUser.getName()));
+        existentUser.setEmail(Objects.requireNonNullElse(newUser.getEmail(), existentUser.getEmail()));
+        return userMapper.toUserDto(existentUser);
     }
 
     @Override
     public void delete(long userId) {
         userRepository.delete(userId);
-    }
-
-    private void checkUserId(long id) {
-        if (userRepository.get(id).isEmpty()) {
-            throw new NotFoundException("Пользователь с идентификатором " + id + " не найден.");
-        }
-    }
-
-    private void checkEmail(UserDto userDto) {
-        List<UserDto> usersWithSameEmails = getAll()
-                .stream()
-                .filter(u -> u.getEmail().equals(userDto.getEmail()))
-                .toList();
-
-        if (!usersWithSameEmails.isEmpty()) {
-            throw new ConflictException(String.format("Пользователь с адресом электронной %s почты существует.",
-                    userDto.getEmail()));
-        }
     }
 }

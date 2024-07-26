@@ -11,15 +11,15 @@ import ru.practicum.shareit.validationgroups.Update;
 @Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
-@Value
 public class ItemDto {
-    Long id;
+    private Long id;
     @NotBlank(groups = {Create.class})
     @Size(groups = {Create.class, Update.class}, min = 1)
-    String name;
+    private String name;
     @NotBlank(groups = {Create.class})
     @Size(groups = {Create.class, Update.class}, min = 1)
-    String description;
+    private String description;
     @NotNull(groups = {Create.class})
-    Boolean available;
+    private Boolean available;
+    private Long ownerId;
 }

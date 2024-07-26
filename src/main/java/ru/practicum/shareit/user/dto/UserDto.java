@@ -11,14 +11,13 @@ import ru.practicum.shareit.validationgroups.Update;
 @Builder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor(force = true)
-@Value
 public class UserDto {
-    Long id;
+    private Long id;
     @NotBlank(groups = {Create.class})
     @Size(groups = {Create.class, Update.class}, min = 1)
-    String name;
+    private String name;
     @Email(groups = {Create.class, Update.class})
     @NotBlank(groups = {Create.class})
     @Size(groups = {Create.class, Update.class}, min = 1)
-    String email;
+    private String email;
 }
