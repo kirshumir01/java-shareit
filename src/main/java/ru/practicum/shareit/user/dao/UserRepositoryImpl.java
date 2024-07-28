@@ -2,6 +2,7 @@ package ru.practicum.shareit.user.dao;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import ru.practicum.shareit.exception.ConflictException;
 import ru.practicum.shareit.user.model.User;
 
 import java.util.*;
@@ -17,9 +18,9 @@ public class UserRepositoryImpl implements UserRepository {
     public User create(User user) {
         user.setId(++currentId);
         if (emails.contains(user.getEmail())) {
-            user.setEmail("duplicate");
             --currentId;
-            return user;
+            throw new ConflictException(String.format("Пользователь с адресом электронной %s почты существует.",
+                    user.getEmail()));
         }
         emails.add(user.getEmail());
         users.put(user.getId(), user);
@@ -38,17 +39,11 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public User update(User newUser) {
-        if (newUser.getEmail() == null) {
-            newUser.setEmail(users.get(newUser.getId()).getEmail());
-        }
-        if (newUser.getName() == null) {
-            newUser.setName(users.get(newUser.getId()).getName());
-        }
         if (emails.contains(newUser.getEmail()) &&
            !users.get(newUser.getId()).getEmail().equals(newUser.getEmail())
         ) {
-            newUser.setEmail("duplicate");
-            return newUser;
+            throw new ConflictException(String.format("Пользователь с адресом электронной %s почты существует.",
+                    newUser.getEmail()));
         }
         emails.remove(users.get(newUser.getId()).getEmail());
         emails.add(newUser.getEmail());
@@ -58,7 +53,9 @@ public class UserRepositoryImpl implements UserRepository {
 
     @Override
     public void delete(long userId) {
-        emails.remove(users.get(userId).getEmail());
-        users.remove(userId);
+        User deletedUser = users.remove(userId);
+        if (users.get(userId) == null) {
+            emails.remove(deletedUser.getEmail());
+        }
     }
 }

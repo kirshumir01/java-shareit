@@ -65,20 +65,20 @@ public class ItemServiceImpl implements ItemService {
     public ItemDto update(ItemDto newItemDto) {
         checkUserExistent(newItemDto.getOwnerId());
 
-        Item existentItem = itemRepository.getItemById(newItemDto.getId()).orElseThrow(() -> {
+        Item item = itemRepository.getItemById(newItemDto.getId()).orElseThrow(() -> {
             throw new NotFoundException(String.format("Вещь с идентификатором %d не найдена", newItemDto.getId()));
         });
         Item itemForUpdate = itemMapper.toItem(newItemDto);
 
-        if (!existentItem.getOwner().getId().equals(newItemDto.getOwnerId())) {
+        if (!item.getOwner().getId().equals(newItemDto.getOwnerId())) {
             throw new NotOwnerException(String.format("Пользователь с идентификатором %d" +
-                    " не является собственником вещи '%s'", existentItem.getOwner().getId(), existentItem.getName()));
+                    " не является собственником вещи '%s'", item.getOwner().getId(), item.getName()));
         } else {
-            existentItem.setName(Objects.requireNonNullElse(itemForUpdate.getName(), existentItem.getName()));
-            existentItem.setDescription(Objects.requireNonNullElse(itemForUpdate.getDescription(), existentItem.getDescription()));
-            existentItem.setAvailable(Objects.requireNonNullElse(itemForUpdate.getAvailable(), existentItem.getAvailable()));
+            item.setName(Objects.requireNonNullElse(itemForUpdate.getName(), item.getName()));
+            item.setDescription(Objects.requireNonNullElse(itemForUpdate.getDescription(), item.getDescription()));
+            item.setAvailable(Objects.requireNonNullElse(itemForUpdate.getAvailable(), item.getAvailable()));
         }
-        return itemMapper.toItemDto(itemRepository.update(existentItem));
+        return itemMapper.toItemDto(itemRepository.update(item));
     }
 
     private void checkUserExistent(long userId) {

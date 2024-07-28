@@ -2,7 +2,6 @@ package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.exception.ConflictException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.dao.UserRepository;
@@ -22,11 +21,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto create(UserDto userDto) {
         User user = userRepository.create(userMapper.toUser(userDto));
-
-        if ("duplicate".equals(user.getEmail())) {
-            throw new ConflictException(String.format("Пользователь с адресом электронной %s почты существует.",
-                    userDto.getEmail()));
-        }
         return userMapper.toUserDto(user);
     }
 
@@ -48,19 +42,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto update(UserDto newUserDto) {
-        User existentUser = userRepository.get(newUserDto.getId()).orElseThrow(() -> {
+        User user = userRepository.get(newUserDto.getId()).orElseThrow(() -> {
             throw new NotFoundException(String.format("Пользователь с id %d не найден.", newUserDto.getId()));
         });
+
         User newUser = userRepository.update(userMapper.toUser(newUserDto));
 
-        if ("duplicate".equals(newUser.getEmail())) {
-            throw new ConflictException(String.format("Пользователь с адресом электронной %s почты существует.",
-                    newUserDto.getEmail()));
-        }
-
-        existentUser.setName(Objects.requireNonNullElse(newUser.getName(), existentUser.getName()));
-        existentUser.setEmail(Objects.requireNonNullElse(newUser.getEmail(), existentUser.getEmail()));
-        return userMapper.toUserDto(existentUser);
+        newUser.setName(Objects.requireNonNullElse(newUserDto.getName(), user.getName()));
+        newUser.setEmail(Objects.requireNonNullElse(newUserDto.getEmail(), user.getEmail()));
+        return userMapper.toUserDto(newUser);
     }
 
     @Override
