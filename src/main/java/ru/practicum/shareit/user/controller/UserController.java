@@ -20,7 +20,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     public UserDto create(@Validated({Create.class}) @RequestBody UserDto userDto) {
         log.info("Запрос на сохранение информации о новом пользователе {}", userDto.getName());
         UserDto createdUser = userService.create(userDto);
