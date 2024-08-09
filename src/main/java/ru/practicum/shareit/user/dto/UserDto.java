@@ -8,9 +8,9 @@ import ru.practicum.shareit.validationgroups.Create;
 import ru.practicum.shareit.validationgroups.Update;
 
 @Data
-@Builder(toBuilder = true)
+@Builder
 @AllArgsConstructor
-@NoArgsConstructor(force = true)
+@NoArgsConstructor
 public class UserDto {
     private Long id;
     @NotBlank(groups = {Create.class})
