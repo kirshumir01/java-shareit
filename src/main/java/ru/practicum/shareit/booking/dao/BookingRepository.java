@@ -1,6 +1,5 @@
 package ru.practicum.shareit.booking.dao;
 
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -13,7 +12,7 @@ import java.util.Optional;
 
 @Repository
 public interface BookingRepository extends JpaRepository<Booking, Long> {
-    List<Booking> findAllByBookerIdOrderByStartDesc(long BookerId);
+    List<Booking> findAllByBookerIdOrderByStartDesc(long bookerId);
 
     List<Booking> findAllByBookerIdAndStartBeforeAndEndAfterOrderByStartDesc(long bookerId, LocalDateTime time1, LocalDateTime time2);
 
