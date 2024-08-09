@@ -22,6 +22,7 @@ public class BookingMapper {
     }
     
     public static BookingDataDto toBookingDataDto(Booking booking) {
+        if (booking == null) return null;
         return BookingDataDto
                 .builder()
                 .id(booking.getId())
