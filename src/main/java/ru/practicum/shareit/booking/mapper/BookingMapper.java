@@ -20,7 +20,7 @@ public class BookingMapper {
                 .item(ItemMapper.toItemDto(booking.getItem()))
                 .build();
     }
-    
+
     public static BookingDataDto toBookingDataDto(Booking booking) {
         if (booking == null) return null;
         return BookingDataDto
