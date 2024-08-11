@@ -3,6 +3,20 @@ target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
+*.class
+*.log
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+hs_err_pid*
+out/
+*.DS_Store
+.DS_Store
+DS_Store
 
 ### STS ###
 .apt_generated
