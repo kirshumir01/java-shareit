@@ -11,7 +11,7 @@ import java.util.*;
 @RequiredArgsConstructor
 public class UserRepositoryImpl implements UserRepository {
     private final Map<Long, User> users = new HashMap<>();
-    Set<String> emails = new HashSet<>();
+    private final Set<String> emails = new HashSet<>();
     private long currentId = 0L;
 
     @Override
@@ -54,7 +54,7 @@ public class UserRepositoryImpl implements UserRepository {
     @Override
     public void delete(long userId) {
         User deletedUser = users.remove(userId);
-        if (users.get(userId) == null) {
+        if (deletedUser != null) {
             emails.remove(deletedUser.getEmail());
         }
     }
