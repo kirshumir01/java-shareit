@@ -21,7 +21,6 @@ import java.util.List;
 @RequestMapping(path = "/items")
 public class ItemController {
     private final ItemService itemService;
-    private final UserService userService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
