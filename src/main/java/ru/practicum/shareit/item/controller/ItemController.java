@@ -7,7 +7,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.comment.dto.CommentInputDto;
 import ru.practicum.shareit.item.comment.dto.CommentOutputDto;
-import ru.practicum.shareit.user.service.UserService;
 import ru.practicum.shareit.validationgroups.Create;
 import ru.practicum.shareit.validationgroups.Update;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -21,7 +20,6 @@ import java.util.List;
 @RequestMapping(path = "/items")
 public class ItemController {
     private final ItemService itemService;
-    private final UserService userService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
