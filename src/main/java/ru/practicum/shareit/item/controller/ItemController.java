@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.item.comment.dto.CommentInputDto;
+import ru.practicum.shareit.item.comment.dto.CommentOutputDto;
 import ru.practicum.shareit.validationgroups.Create;
 import ru.practicum.shareit.validationgroups.Update;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -20,7 +22,7 @@ public class ItemController {
     private final ItemService itemService;
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
+    @ResponseStatus(HttpStatus.OK)
     public ItemDto create(
             @RequestHeader("X-Sharer-User-Id") long userId,
             @Validated({Create.class}) @RequestBody ItemDto itemDto) {
@@ -33,8 +35,8 @@ public class ItemController {
     @GetMapping("/{itemId}")
     public ItemDto getItemById(@PathVariable("itemId") long itemId) {
         log.info("Запрос на получение информации о вещи с идентификатором {}", itemId);
-        ItemDto itemDto = itemService.getItemById(itemId);
-        log.info("Получена информация о вещи {}", itemService.getItemById(itemId).getName());
+        ItemDto itemDto = itemService.get(itemId);
+        log.info("Получена информация о вещи {}", itemDto.getName());
         return itemDto;
     }
 
@@ -65,5 +67,17 @@ public class ItemController {
         ItemDto updatedItem = itemService.update(itemDto);
         log.info("Информация о вещи {} обновлена", itemDto.getName());
         return updatedItem;
+    }
+
+    @PostMapping("/{itemId}/comment")
+    @ResponseStatus(HttpStatus.OK)
+    public CommentOutputDto addComment(@Validated({Create.class}) @RequestBody CommentInputDto commentInputDto,
+                                       @RequestHeader("X-Sharer-User-Id") long userId,
+                                       @PathVariable long itemId) {
+        log.info("Запрос на создание комментария к вещи {}", itemService.get(itemId).getName());
+        CommentOutputDto createdComment = itemService.createComment(commentInputDto, userId, itemId);
+        log.info("Комментарий к вещи с id = {} создан: ", itemId);
+        log.info("Содержание комментария: {}", createdComment.toString());
+        return createdComment;
     }
 }
