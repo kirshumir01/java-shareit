@@ -45,21 +45,22 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findAllByItemOwnerIdAndStatusOrderByStartDesc(long ownerId, Status state);
 
     @EntityGraph(attributePaths = {"item", "booker"})
-    List<Booking> findAllByBookerIdAndItemIdAndStatusAndEndBefore(long bookerId, long itemId, Status status, LocalDateTime time);
+    List<Booking> findAllByBookerIdAndItemIdAndStatusAndEndBefore(
+            long bookerId, long itemId, Status status, LocalDateTime time);
 
     @EntityGraph(attributePaths = {"item"})
     Optional<Booking> findFirstByItemIdAndStartLessThanEqualAndStatus(
             long itemId, LocalDateTime now, Status status, Sort end);
 
     @EntityGraph(attributePaths = {"item"})
-    List<Booking> findByItemInAndStartLessThanEqualAndStatus
-            (List<Item> items, LocalDateTime now, Status approved, Sort end);
+    List<Booking> findByItemInAndStartLessThanEqualAndStatus(
+            List<Item> items, LocalDateTime now, Status approved, Sort end);
 
     @EntityGraph(attributePaths = {"item"})
-    Optional<Booking> findFirstByItemIdAndStartAfterAndStatus
-            (long itemId, LocalDateTime now, Status status, Sort end);
+    Optional<Booking> findFirstByItemIdAndStartAfterAndStatus(
+            long itemId, LocalDateTime now, Status status, Sort end);
 
     @EntityGraph(attributePaths = {"item"})
-    List<Booking> findByItemInAndStartAfterAndStatus
-            (List<Item> items, LocalDateTime now, Status approved, Sort end);
+    List<Booking> findByItemInAndStartAfterAndStatus(
+            List<Item> items, LocalDateTime now, Status approved, Sort end);
 }
