@@ -1,12 +1,13 @@
 package ru.practicum.shareit.booking.dto;
 
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
-import ru.practicum.shareit.validationgroups.Create;
 
 import java.time.LocalDateTime;
 
@@ -14,13 +15,15 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class BookingInputDto {
-    @NotNull(groups = {Create.class})
+public class BookingCreateDto {
+    @NotNull
     private Long itemId;
-    @NotNull(groups = {Create.class})
+    @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-ddTHH:mm:ss")
+    @FutureOrPresent
     private LocalDateTime start;
-    @NotNull(groups = {Create.class})
+    @NotNull
     @DateTimeFormat(pattern = "yyyy-MM-ddTHH:mm:ss")
+    @Future
     private LocalDateTime end;
 }

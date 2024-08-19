@@ -8,7 +8,8 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CommentInputDto {
+public class CommentCreateDto {
     @NotBlank
     private String text;
+    private Long itemId;
 }

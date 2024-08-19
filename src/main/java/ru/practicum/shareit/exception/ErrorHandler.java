@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
 @RestControllerAdvice("ru.practicum.shareit")
-public class ErrorHandler {
+public class  ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST) // 400
     public ErrorResponse handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {

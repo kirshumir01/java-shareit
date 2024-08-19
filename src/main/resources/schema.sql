@@ -24,7 +24,7 @@ CREATE TABLE IF NOT EXISTS bookings (
     start_time TIMESTAMP NOT NULL,
     end_time TIMESTAMP NOT NULL,
     item_id BIGINT NOT NULL,
-    client_id BIGINT NOT NULL,
+    booker_id BIGINT NOT NULL,
     status VARCHAR NOT NULL,
     PRIMARY KEY (id)
 );
@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS comments (
 
 ALTER TABLE items ADD FOREIGN KEY (owner_id) REFERENCES users (id) ON DELETE CASCADE;
 
-ALTER TABLE bookings ADD FOREIGN KEY (client_id) REFERENCES users (id) ON DELETE CASCADE;
+ALTER TABLE bookings ADD FOREIGN KEY (booker_id) REFERENCES users (id) ON DELETE CASCADE;
 
 ALTER TABLE bookings ADD FOREIGN KEY (item_id) REFERENCES items (id) ON DELETE CASCADE;
 

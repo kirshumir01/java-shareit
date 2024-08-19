@@ -1,14 +1,15 @@
 package ru.practicum.shareit.booking.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.booking.dto.BookingInputDto;
-import ru.practicum.shareit.booking.dto.BookingOutputDto;
+import ru.practicum.shareit.booking.dto.BookingCreateDto;
+import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.service.BookingService;
-import ru.practicum.shareit.validationgroups.Create;
+import ru.practicum.shareit.booking.model.State;
+import ru.practicum.shareit.exception.BadRequestException;
 
 import java.util.List;
 
@@ -21,61 +22,60 @@ public class BookingController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.OK)
-    public BookingOutputDto create(@RequestHeader("X-Sharer-User-Id") long userId,
-                                   @Validated({Create.class}) @RequestBody BookingInputDto bookingInputDto) {
-        log.info("Запрос на сохранение информации о новом бронировании {}", bookingInputDto.toString());
-        BookingOutputDto booking = bookingService.create(userId, bookingInputDto);
-        log.info("Информация о новом бронировании вещи с id = {} сохранена", bookingInputDto.getItemId());
-        log.info("Информация об арендаторе: {}", booking.getBooker().toString());
-        log.info("Время начала аренды: {}", booking.getStart());
-        log.info("Время завершения аренды: {}", booking.getEnd());
+    public BookingDto create(@RequestHeader("X-Sharer-User-Id") long userId,
+                             @RequestBody @Valid BookingCreateDto bookingCreateDto) {
+        log.info("Запрос на сохранение бронирования: POST /bookings");
+        BookingDto booking = bookingService.create(userId, bookingCreateDto);
+        log.info("Информация о бронировании сохранена: {}", booking.toString());
         return booking;
     }
 
     @PatchMapping("/{bookingId}")
-    public BookingOutputDto approvedByOwner(@RequestHeader("X-Sharer-User-Id") long userId,
-                                            @PathVariable("bookingId") long bookingId,
-                                            @RequestParam("approved") boolean approved) {
-        log.info("Запрос на обновление информации о бронировании c id = {}", bookingId);
-        BookingOutputDto updatedBooking = bookingService.approvedByOwner(userId, bookingId, approved);
-        log.info("Обновленная информация о бронировании с id = {}", bookingId);
-        log.info("Информация об арендаторе: {}", updatedBooking.getBooker().toString());
-        log.info("Время начала аренды: {}", updatedBooking.getStart());
-        log.info("Время завершения аренды: {}", updatedBooking.getEnd());
+    public BookingDto approvedByOwner(@RequestHeader("X-Sharer-User-Id") long userId,
+                                      @PathVariable("bookingId") long bookingId,
+                                      @RequestParam("approved") boolean approved) {
+        log.info("Запрос на обновление бронирования: PATCH /bookings/{}", bookingId);
+        BookingDto updatedBooking = bookingService.approvedByOwner(userId, bookingId, approved);
+        log.info("Информация о бронировании обновлена: {}", updatedBooking.toString());
         return updatedBooking;
     }
 
     @GetMapping("/{bookingId}")
-    public BookingOutputDto get(@RequestHeader("X-Sharer-User-Id") long userId,
-                                @PathVariable("bookingId") long bookingId) {
-        log.info("Запрос на получение информации о бронировании с id = {} пользователем с id = {}", bookingId, userId);
-        BookingOutputDto booking = bookingService.getBookingByIdAndUserId(userId, bookingId);
-        log.info("Информация о бронировании с id = {}", bookingId);
-        log.info("Информация об арендаторе: {}", booking.getBooker().toString());
-        log.info("Время начала аренды: {}", booking.getStart());
-        log.info("Время завершения аренды: {}", booking.getEnd());
+    public BookingDto get(@RequestHeader("X-Sharer-User-Id") long userId,
+                          @PathVariable("bookingId") long bookingId) {
+        log.info("Запрос на получение бронирования: GET /bookings/{}", bookingId);
+        BookingDto booking = bookingService.getBookingByIdAndUserId(userId, bookingId);
+        log.info("Информация о бронировании получена: {}", booking.toString());
         return booking;
     }
 
     @GetMapping
-    public List<BookingOutputDto> getAllByClient(@RequestHeader("X-Sharer-User-Id") long userId,
-                                                 @RequestParam(defaultValue = "ALL", required = false) String state) {
-        log.info("Запрос на получение информации обо всех бронированиях пользователем с id = {} и статусом '{}'",
+    public List<BookingDto> getAllByBooker(@RequestHeader("X-Sharer-User-Id") long userId,
+                                           @RequestParam(defaultValue = "ALL", required = false) State state) {
+        log.info("Запрос на получение всех бронирований пользователя с id = {} и статусом '{}': GET /bookings",
                 userId, state);
-        List<BookingOutputDto> bookings = bookingService.getAllByBooker(userId, state);
-        log.info("Информация о бронированиях пользователем с id = {}:", userId);
-        log.info("Количество бронирований со статусом '{}': {}", bookings.size(), state);
+        try {
+            State.valueOf(String.valueOf(state));
+        } catch (BadRequestException e) {
+            throw new BadRequestException(String.format("Неизвестный статус состояния %s.", state));
+        }
+        List<BookingDto> bookings = bookingService.getAllByBooker(userId, state);
+        log.info("Количество бронирований пользователя: {}", bookings.size());
         return bookings;
     }
 
     @GetMapping("/owner")
-    public List<BookingOutputDto> getAllByOwner(@RequestHeader("X-Sharer-User-Id") long userId,
-                                                @RequestParam(defaultValue = "ALL", required = false) String state) {
-        log.info("Запрос на получение информации обо всех бронированиях арендодателя с id = {} и статусом '{}'",
+    public List<BookingDto> getAllByOwner(@RequestHeader("X-Sharer-User-Id") long userId,
+                                          @RequestParam(defaultValue = "ALL", required = false) State state) {
+        log.info("Запрос на получение всех бронирований арендодателя с id = {} и статусом '{}': GET /bookings",
                 userId, state);
-        List<BookingOutputDto> bookings = bookingService.getAllByOwner(userId, state);
-        log.info("Информация о бронированиях арендодателя с id = {}:", userId);
-        log.info("Количество бронирований со статусом '{}': {}", bookings.size(), state);
+        try {
+            State.valueOf(String.valueOf(state));
+        } catch (BadRequestException e) {
+            throw new BadRequestException(String.format("Неизвестный статус состояния %s.", state));
+        }
+        List<BookingDto> bookings = bookingService.getAllByOwner(userId, state);
+        log.info("Количество бронирований арендодателя: {}", bookings.size());
         return bookings;
     }
 }
