@@ -1,25 +1,22 @@
 package ru.practicum.shareit.item.dto;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.*;
-import ru.practicum.shareit.validationgroups.Create;
-import ru.practicum.shareit.validationgroups.Update;
+import ru.practicum.shareit.booking.dto.BookingDto;
+import ru.practicum.shareit.item.comment.dto.CommentDto;
+
+import java.util.List;
 
 @Data
-@Builder(toBuilder = true)
+@Builder
 @AllArgsConstructor
-@NoArgsConstructor(force = true)
+@NoArgsConstructor
 public class ItemDto {
     private Long id;
-    @NotBlank(groups = {Create.class})
-    @Size(groups = {Create.class, Update.class}, min = 1)
     private String name;
-    @NotBlank(groups = {Create.class})
-    @Size(groups = {Create.class, Update.class}, min = 1)
     private String description;
-    @NotNull(groups = {Create.class})
     private Boolean available;
     private Long ownerId;
+    private BookingDto.BookingShortDto lastBooking;
+    private BookingDto.BookingShortDto nextBooking;
+    private List<CommentDto> comments;
 }

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @Slf4j
 @RestControllerAdvice("ru.practicum.shareit")
-public class ErrorHandler {
+public class  ErrorHandler {
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST) // 400
     public ErrorResponse handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
@@ -33,17 +33,24 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.CONFLICT)
+    @ResponseStatus(HttpStatus.CONFLICT) // 409
     public ErrorResponse handleConflictException(final ConflictException e) {
         log.error("Возникла ошибка. Обнаружены совпадения.");
         return new ErrorResponse("Обнаружены совпадения", e.getMessage());
     }
 
     @ExceptionHandler
-    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ResponseStatus(HttpStatus.FORBIDDEN) // 403
     public ErrorResponse handleNotOwnerException(final NotOwnerException e) {
         log.error("Возникла ошибка. Пользователь не является владельцем вещи.");
         return new ErrorResponse("Пользователь не является владельцем вещи", e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST) // 400
+    public ErrorResponse handleBadRequest(final BadRequestException e) {
+        log.error("Возникла ошибка. Ошибка формирования запроса.");
+        return new ErrorResponse("Ошибка формирования запроса", e.getMessage());
     }
 
     @ExceptionHandler
