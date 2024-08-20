@@ -17,6 +17,13 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@NamedEntityGraph(
+        name = "booking-entity-graph",
+        attributeNodes = {
+                @NamedAttributeNode("item"),
+                @NamedAttributeNode("booker")
+        }
+)
 public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

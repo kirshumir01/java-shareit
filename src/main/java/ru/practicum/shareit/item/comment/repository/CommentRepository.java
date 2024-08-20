@@ -12,9 +12,9 @@ import java.util.List;
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
-    @EntityGraph(attributePaths = "author")
+    @EntityGraph(value = "comment-entity-graph")
     List<Comment> findAllByItemId(long itemId);
 
-    @EntityGraph(attributePaths = "author")
+    @EntityGraph(value = "comment-entity-graph")
     List<Comment> findByItemIn(List<Item> allByOwnerId, Sort created);
 }
