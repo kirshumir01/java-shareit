@@ -77,7 +77,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
         List<Item> items = itemRepository.findByRequestId(requestIds);
         Map<Long, List<ItemShortDto>> map = new HashMap<>();
         for (Item item : items) {
-            if(!map.containsKey(item.getRequest().getId())) {
+            if (!map.containsKey(item.getRequest().getId())) {
                 map.put(item.getId(), new ArrayList<>());
             }
             List<ItemShortDto> itemShortDtos = map.get(item.getId());
