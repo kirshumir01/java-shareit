@@ -10,14 +10,21 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.dto.BookingCreateDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
+import ru.practicum.shareit.exception.BadRequestException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.time.LocalDateTime;
+import java.util.List;
 
 @SpringBootTest
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
@@ -64,7 +71,6 @@ class BookingServiceIntegrationTest {
         userRepository.save(user);
         userRepository.save(owner);
         itemRepository.save(item);
-        bookingRepository.save(booking);
     }
 
     @Test
@@ -96,20 +102,144 @@ class BookingServiceIntegrationTest {
         Assertions.assertThat(createdBookingDto.getBooker().getName()).isEqualTo(user.getName());
         Assertions.assertThat(createdBookingDto.getItem().getName()).isEqualTo(newItem.getName());
     }
-
     @Test
-    void approvedByOwnerTest() {
+    void getAllByBookerCurrentTest() {
+        Booking booking1 = Booking.builder()
+                .booker(user)
+                .item(item)
+                .start(LocalDateTime.now().minusDays(10))
+                .end(LocalDateTime.now().plusDays(2))
+                .status(BookingStatus.APPROVED)
+                .build();
+
+        Booking booking2 = Booking.builder()
+                .booker(user)
+                .item(item)
+                .start(LocalDateTime.now().minusDays(5))
+                .end(LocalDateTime.now().plusDays(10))
+                .status(BookingStatus.APPROVED)
+                .build();
+
+        bookingRepository.save(booking1);
+        bookingRepository.save(booking2);
+
+        List<BookingDto> bookings = bookingService.getAllByBooker(user.getId(), BookingState.CURRENT);
+
+        assertThat(bookings).hasSize(2);
+        assertThat(bookings.get(0).getId()).isEqualTo(booking2.getId());
+        assertThat(bookings.get(1).getId()).isEqualTo(booking1.getId());
     }
 
     @Test
-    void getBookingByIdAndUserIdTest() {
+    void getAllByBookerPastTest() {
+        Booking booking1 = Booking.builder()
+                .booker(user)
+                .item(item)
+                .start(LocalDateTime.now().minusDays(30))
+                .end(LocalDateTime.now().minusDays(15))
+                .status(BookingStatus.CANCELLED)
+                .build();
+
+        Booking booking2 = Booking.builder()
+                .booker(user)
+                .item(item)
+                .start(LocalDateTime.now().minusDays(14))
+                .end(LocalDateTime.now().minusDays(7))
+                .status(BookingStatus.CANCELLED)
+                .build();
+
+        bookingRepository.save(booking1);
+        bookingRepository.save(booking2);
+
+        List<BookingDto> bookings = bookingService.getAllByBooker(user.getId(), BookingState.PAST);
+
+        assertThat(bookings).hasSize(2);
+        assertThat(bookings.get(0).getId()).isEqualTo(booking2.getId());
+        assertThat(bookings.get(1).getId()).isEqualTo(booking1.getId());
     }
 
     @Test
-    void getAllByBookerTest() {
+    void getAllByBookerАгегкуTest() {
+        Booking booking1 = Booking.builder()
+                .booker(user)
+                .item(item)
+                .start(LocalDateTime.now().plusDays(30))
+                .end(LocalDateTime.now().plusDays(45))
+                .status(BookingStatus.APPROVED)
+                .build();
+
+        Booking booking2 = Booking.builder()
+                .booker(user)
+                .item(item)
+                .start(LocalDateTime.now().plusDays(60))
+                .end(LocalDateTime.now().plusDays(80))
+                .status(BookingStatus.APPROVED)
+                .build();
+
+        bookingRepository.save(booking1);
+        bookingRepository.save(booking2);
+
+        List<BookingDto> bookings = bookingService.getAllByBooker(user.getId(), BookingState.FUTURE);
+
+        assertThat(bookings).hasSize(2);
+        assertThat(bookings.get(0).getId()).isEqualTo(booking2.getId());
+        assertThat(bookings.get(1).getId()).isEqualTo(booking1.getId());
     }
 
     @Test
-    void getAllByOwnerTest() {
+    void getAllByBookerAllBookings() {
+        Booking booking1 = Booking.builder()
+                .booker(user)
+                .item(item)
+                .start(LocalDateTime.now().plusDays(30))
+                .end(LocalDateTime.now().plusDays(45))
+                .status(BookingStatus.APPROVED)
+                .build();
+
+        Booking booking2 = Booking.builder()
+                .booker(user)
+                .item(item)
+                .start(LocalDateTime.now().minusDays(14))
+                .end(LocalDateTime.now().minusDays(7))
+                .status(BookingStatus.CANCELLED)
+                .build();
+
+        bookingRepository.save(booking1);
+        bookingRepository.save(booking2);
+
+        List<BookingDto> bookings = bookingService.getAllByBooker(user.getId(), BookingState.ALL);
+
+        assertThat(bookings).hasSize(2);
+        assertThat(bookings.get(0).getId()).isEqualTo(booking1.getId());
+        assertThat(bookings.get(1).getId()).isEqualTo(booking2.getId());
+    }
+
+
+    @Test
+    void getAllByOwnerAllBookingsTest() {
+        Booking booking1 = Booking.builder()
+                .booker(user)
+                .item(item)
+                .start(LocalDateTime.now().plusDays(30))
+                .end(LocalDateTime.now().plusDays(45))
+                .status(BookingStatus.APPROVED)
+                .build();
+
+        Booking booking2 = Booking.builder()
+                .booker(user)
+                .item(item)
+                .start(LocalDateTime.now().minusDays(14))
+                .end(LocalDateTime.now().minusDays(7))
+                .status(BookingStatus.CANCELLED)
+                .build();
+
+        bookingRepository.save(booking1);
+        bookingRepository.save(booking2);
+
+        List<BookingDto> bookings = bookingService.getAllByOwner(owner.getId(), BookingState.ALL);
+
+        assertThat(bookings).hasSize(2);
+        assertThat(bookings.get(0).getId()).isEqualTo(booking1.getId());
+        assertThat(bookings.get(1).getId()).isEqualTo(booking2.getId());
     }
 }
