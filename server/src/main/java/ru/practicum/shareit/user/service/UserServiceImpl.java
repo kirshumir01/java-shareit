@@ -24,7 +24,7 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Transactional
     public UserDto create(UserCreateDto userCreateDto) {
         Set<String> emails = userRepository.findAll().stream().map(User::getEmail).collect(Collectors.toSet());
 
@@ -37,7 +37,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
+    @Transactional(readOnly = true)
     public UserDto get(long userId) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException(String.format("User with id = %d not found", userId)));
@@ -45,7 +45,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
+    @Transactional(readOnly = true)
     public List<UserDto> getAll() {
         return userRepository.findAll()
                 .stream()
@@ -54,7 +54,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Transactional
     public UserDto update(UserUpdateDto userUpdateDto) {
         User user = userRepository.findById(userUpdateDto.getId()).orElseThrow(
                 () -> new NotFoundException(String.format("User with id = %d not found", userUpdateDto.getId())));
@@ -74,7 +74,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Transactional
     public void delete(long userId) {
         userRepository.deleteById(userId);
     }

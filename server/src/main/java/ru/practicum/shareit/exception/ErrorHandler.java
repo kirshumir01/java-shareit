@@ -8,6 +8,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
+
 @Slf4j
 @RestControllerAdvice("ru.practicum.shareit")
 public class  ErrorHandler {
@@ -55,15 +59,10 @@ public class  ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR) // 500
-    public ErrorResponse handleBadRequest(final InternalServerError e) {
+    public ErrorResponse handleThrowable(final Exception e) {
         log.error(e.getMessage());
-        return new ErrorResponse(e.getMessage(), null);
-    }
-
-    @ExceptionHandler
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR) // 500
-    public ErrorResponse handleThrowable(final Throwable e) {
-        log.error(e.getMessage());
+        final ByteArrayOutputStream out = new ByteArrayOutputStream();
+        e.printStackTrace(new PrintWriter(out, true, StandardCharsets.UTF_8));
         return new ErrorResponse("Internal server error", e.getMessage());
     }
 }

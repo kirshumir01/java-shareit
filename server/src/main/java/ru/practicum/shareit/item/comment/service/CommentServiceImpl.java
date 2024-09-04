@@ -29,7 +29,7 @@ public class CommentServiceImpl implements CommentService {
     private final BookingRepository bookingRepository;
 
     @Override
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Transactional
     public CommentDto createComment(CommentCreateDto commentCreateDto, long itemId, long userId) {
         if (bookingRepository.findAllByBookerIdAndItemIdAndStatusAndEndBefore(userId, itemId, BookingStatus.APPROVED,
                 LocalDateTime.now()).isEmpty()) {

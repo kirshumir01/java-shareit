@@ -32,7 +32,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
 
 
     @Override
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Transactional
     public ItemRequestDto create(long userId, ItemRequestCreateDto itemRequestCreateDto) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException(String.format("User not found by id = %d", userId)));
@@ -41,7 +41,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
+    @Transactional
     public List<ItemRequestDtoWithAnswers> getAllUserRequests(long userId) {
         checkUserExists(userId);
         List<ItemRequest> requests = itemRequestRepository.findAllByRequestor(userId);
@@ -49,7 +49,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
+    @Transactional
     public List<ItemRequestDto> getAllRequestsExceptUser(long userId) {
         checkUserExists(userId);
         List<ItemRequest> requests = itemRequestRepository.findAllExceptRequestor(userId);
@@ -59,7 +59,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     }
 
     @Override
-    @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
+    @Transactional
     public ItemRequestDtoWithAnswers getRequestById(long requestId) {
         ItemRequest request = itemRequestRepository.findById(requestId).orElseThrow(
                 () -> new NotFoundException(String.format("Item request with id = %d not found", requestId)));

@@ -50,12 +50,7 @@ public class BookingController {
     public List<BookingDto> getAllByBooker(@RequestHeader("X-Sharer-User-Id") long userId,
                                            @RequestParam(defaultValue = "ALL", required = false) BookingState state) {
         log.info("Server: received request to get all bookings by userId = {} and state = {}", userId, state);
-
-        try {
-            BookingState.valueOf(String.valueOf(state));
-        } catch (BadRequestException e) {
-            throw new BadRequestException(String.format("Unknown state: %s", state));
-        }
+        BookingState.valueOf(String.valueOf(state));
         return bookingService.getAllByBooker(userId, state);
     }
 
@@ -64,12 +59,7 @@ public class BookingController {
     public List<BookingDto> getAllByOwner(@RequestHeader("X-Sharer-User-Id") long userId,
                                           @RequestParam(defaultValue = "ALL", required = false) BookingState state) {
         log.info("Server: received request to get all bookings by ownerId = {} and state = {}", userId, state);
-
-        try {
-            BookingState.valueOf(String.valueOf(state));
-        } catch (BadRequestException e) {
-            throw new BadRequestException(String.format("Unknown state: %s", state));
-        }
+        BookingState.valueOf(String.valueOf(state));
         return bookingService.getAllByOwner(userId, state);
     }
 }

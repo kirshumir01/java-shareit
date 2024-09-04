@@ -16,10 +16,7 @@ import ru.practicum.shareit.user.model.User;
 @NoArgsConstructor
 @NamedEntityGraph(
         name = "item-entity-graph",
-        attributeNodes = {
-                @NamedAttributeNode("owner"),
-                @NamedAttributeNode("request")
-        })
+        attributeNodes = @NamedAttributeNode("owner"))
 public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

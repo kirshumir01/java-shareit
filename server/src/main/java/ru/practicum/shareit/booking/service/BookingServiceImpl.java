@@ -11,7 +11,6 @@ import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.BadRequestException;
-import ru.practicum.shareit.exception.InternalServerError;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
@@ -28,7 +27,6 @@ public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
-    private final BookingMapper bookingMapper;
 
     @Override
     @Transactional
@@ -169,7 +167,7 @@ public class BookingServiceImpl implements BookingService {
         }
 
         if (Boolean.FALSE.equals(item.getAvailable())) {
-            throw new InternalServerError("Item is unavailable for booking: status of booking - FALSE");
+            throw new IllegalArgumentException("Item is unavailable for booking: status of booking - FALSE");
         }
 
         if (bookingRepository.findById(item.getId())

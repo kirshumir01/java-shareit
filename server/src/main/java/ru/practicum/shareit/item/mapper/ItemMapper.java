@@ -30,6 +30,7 @@ public class ItemMapper {
     public static ItemShortDto toItemShortDto(Item item) {
         return ItemShortDto
                 .builder()
+                .id(item.getId())
                 .name(item.getName())
                 .ownerId(item.getOwner().getId())
                 .build();

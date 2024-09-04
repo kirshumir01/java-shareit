@@ -8,7 +8,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Sort;
-import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
@@ -22,7 +21,6 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.ItemUpdateDto;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
-import ru.practicum.shareit.request.model.ItemRequest;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -44,14 +42,9 @@ class ItemServiceImplTest {
     private UserRepository mockUserRepository;
     @Mock
     private BookingRepository mockBookingRepository;
-    @Mock
-    private ItemRequestRepository mockItemRequestRepository;
 
     @InjectMocks
     ItemServiceImpl itemServiceImpl;
-
-    @InjectMocks
-    CommentServiceImpl commentServiceImpl;
 
     @Test
     void itemCreateTest() {

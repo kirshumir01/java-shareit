@@ -43,7 +43,7 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRequestRepository itemRequestRepository;
 
     @Override
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Transactional
     public ItemDto create(ItemCreateDto itemCreateDto, long userId) {
         User itemOwner = userRepository.findById(userId).orElseThrow(
                 () -> new NotFoundException(String.format("User not found by id = %d", userId)));
@@ -58,20 +58,22 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
+    @Transactional(readOnly = true)
     public ItemDto get(long itemId, long userId) {
         Item item = itemRepository.findById(itemId).orElseThrow(
                 () -> new NotFoundException(String.format("Item not found by id = %d", itemId)));
 
+        ItemDto itemDto = addCommentsAndBookingsToItem(item);
+
         if (!item.getOwner().getId().equals(userId)) {
-            return addCommentsWithoutBookingsToItem(item);
-        } else {
-            return addCommentsAndBookingsToItem(item);
+            itemDto.setNextBooking(null);
+            itemDto.setLastBooking(null);
         }
+        return itemDto;
     }
 
     @Override
-    @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
+    @Transactional(readOnly = true)
     public List<ItemDto> getAllByOwnerId(long ownerId) {
         checkUserExists(ownerId);
         List<Item> items = itemRepository.findAllByOwnerIdOrderByIdAsc(ownerId);
@@ -79,14 +81,14 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    @Transactional(readOnly = true, isolation = Isolation.REPEATABLE_READ)
+    @Transactional(readOnly = true)
     public List<ItemDto> getByText(String text) {
         if (text.isBlank() || text.isEmpty()) return List.of();
         return itemRepository.getByText(text).stream().map(ItemMapper::toItemDto).toList();
     }
 
     @Override
-    @Transactional(isolation = Isolation.REPEATABLE_READ)
+    @Transactional
     public ItemDto update(ItemUpdateDto itemUpdateDto) {
         checkUserExists(itemUpdateDto.getOwnerId());
         checkItemExists(itemUpdateDto.getId());
@@ -116,18 +118,6 @@ public class ItemServiceImpl implements ItemService {
         if (!itemRepository.existsById(itemId)) {
             throw new NotFoundException(String.format("Item not found by id = %d", itemId));
         }
-    }
-
-    private ItemDto addCommentsWithoutBookingsToItem(Item item) {
-        ItemDto itemDto = ItemMapper.toItemDto(item);
-
-        itemDto.setLastBooking(null);
-        itemDto.setNextBooking(null);
-        itemDto.setComments(commentRepository.findAllByItemId(itemDto.getId())
-                .stream()
-                .map(CommentMapper::toCommentDto)
-                .toList());
-        return itemDto;
     }
 
     private ItemDto addCommentsAndBookingsToItem(Item item) {
