@@ -1,7 +1,5 @@
 # ShareIt
 
-*Read this on [English](README.en.md).*
-
 ## Описание
 ___
 
@@ -61,16 +59,12 @@ ___
 
 ## Инструменты и технологии
 ___
-- фреймворк: **Spring Boot 3.2.4**:
-  - spring-boot-starter-web;
-  - spring-boot-starter-actuator;
-  - spring-boot-starter-data-jpa;
-  - spring-boot-starter-test.
-- аннотирование классов приложения: **Lombok**
-- хранение данных (рабочий режим): **Postgre SQL**
-- хранение данных (режим тестирования): **H2 Database**
-- сборка и управление зависимостями: **Apache Maven 3.9.9**
-- версия Java: **21**
+- Java 21
+- фреймворк: Spring Boot
+- аннотирование классов приложения: Lombok
+- хранение данных (рабочий режим): Postgre SQL
+- хранение данных (режим тестирования): H2 Database
+- сборка и управление зависимостями: Apache Maven 3.9.9
 
 ## Схема базы данных приложения (ER-диаграмма)
 ___
@@ -373,30 +367,20 @@ ___
 git clone https://github.com/kirshumir01/java-shareit.git
 ```
 
-2. Перейдите в корневую директорию склонированного проекта и выполните команду:
+2. Перейдите в корневую директорию склонированного проекта и выполните последовательно команды:
 
 ```shell
 cd java-shareit
 ```
 
-3. Запустите сборку проекта командой:
-
-```shell
-./mvnw clean install
-```
-
 4. Запустите приложение, выполнив последовательно следующие команды в двух отдельных окнах терминала:
 
 ```shell
-./mvnw -pl :shareit-server spring-boot:run
+mvn -pl :shareit-server spring-boot:run
 ```
 
 ```shell
-./mvnw -pl :shareit-gateway spring-boot:run
+mvn -pl :shareit-gateway spring-boot:run
 ```
 
 Доступ к публичному API будет открыт по ссылке через адресную строку интернет-браузера: `http://localhost:8080`.
-
-*Read this on [English](README.en.md).*
-
-
